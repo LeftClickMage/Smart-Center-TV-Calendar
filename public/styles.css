@@ -1,0 +1,357 @@
+/* Sized in vh (percent of screen height) so the layout looks the same on a
+   1080p or 4K 50" TV. --scale comes from fontScale in config.js. */
+:root {
+  --scale: 1;
+  --black: #000000;
+  --gold: #CFB991;           /* Purdue Boilermaker Gold */
+  --gold-dark: #8E6F3E;
+  --ink: #1d1d1f;
+  --muted: #5b5b60;
+  --page: #f4f3f0;
+  --grid-bg: #ffffff;
+  --line: #d9d7d2;
+  --line-soft: #ecebe7;
+  --today: #faf5ea;
+  --now: #c8102e;
+
+  --masthead-h: 11.5vh;
+  --legend-h: 7.5vh;
+  --axis-w: 7.5vh;
+  --dayhead-h: 6vh;
+  --today-border: 0.5vh;
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  height: 100%;
+  overflow: hidden;
+  background: var(--page);
+  color: var(--ink);
+  /* "acumin-pro" = Adobe Fonts web project (see adobeFontsUrl in config.js);
+     "Acumin Pro" = copy installed on the computer; the rest are fallbacks. */
+  font-family: "acumin-pro", "Acumin Pro", "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+  cursor: none; /* hide the mouse pointer on the TV */
+}
+
+body {
+  display: flex;
+  flex-direction: column;
+}
+
+/* ── Header ─────────────────────────────────────────────────────────────── */
+.masthead {
+  height: var(--masthead-h);
+  flex: none;
+  display: flex;
+  align-items: center;
+  gap: 3.5vh;
+  padding: 0 3vh;
+  background: var(--black);
+  color: #fff;
+  border-bottom: 0.6vh solid var(--gold);
+}
+
+.logo {
+  height: 5.6vh;
+  width: auto;
+  flex: none;
+}
+
+.titles {
+  flex: 1;
+  min-width: 0;
+  padding-left: 3.5vh;
+  border-left: 0.25vh solid #ffffff;
+}
+
+.title {
+  font-size: calc(2.3vh * var(--scale));
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  line-height: 1.2;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* "SMART Center": normally the pre-drawn United Sans image
+   (assets/smart-center-title.svg). If subtitleImage is turned off, the text
+   uses United Sans where installed, otherwise Acumin Pro. */
+.subtitle {
+  font-family: "United Sans Reg", "United Sans", "acumin-pro", "Acumin Pro", "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+  font-size: calc(4.6vh * var(--scale));
+  font-weight: 800;
+  color: var(--gold);
+  line-height: 1.1;
+  letter-spacing: 0.01em;
+}
+
+/* Image is trimmed to the letters, so its height = the capital-letter height */
+.subtitle-img {
+  display: block;
+  height: calc(3.5vh * var(--scale));
+  width: auto;
+  margin-top: 0.7vh;
+}
+
+.clock {
+  flex: none;
+  text-align: right;
+}
+
+.clock-time {
+  font-size: calc(4.2vh * var(--scale));
+  font-weight: 700;
+  line-height: 1.1;
+  font-variant-numeric: tabular-nums;
+}
+
+.clock-date {
+  font-size: calc(2.2vh * var(--scale));
+  color: var(--gold);
+  line-height: 1.3;
+}
+
+/* ── Legend ─────────────────────────────────────────────────────────────── */
+.legend-bar {
+  position: relative;
+  height: var(--legend-h);
+  flex: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 3vh;
+}
+
+.legend { justify-content: center; }
+
+.legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.6vh;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.legend li {
+  font-size: calc(3vh * var(--scale));
+  font-weight: 700;
+  padding: 0.7vh 2.2vh;
+  border-radius: 0.8vh;
+  white-space: nowrap;
+  transition: opacity 0.3s, box-shadow 0.3s;
+}
+
+/* While cycling: the calendar on screen stands out, the others fade back */
+.legend li.active { box-shadow: 0 0 0 0.35vh var(--black); }
+.legend li.inactive { opacity: 0.3; }
+
+/* Warning text (only shown when a calendar can't refresh); pinned to the
+   right so it doesn't push the centered subject chips off-center. */
+.status {
+  position: absolute;
+  right: 3vh;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: calc(1.7vh * var(--scale));
+  color: var(--muted);
+  white-space: nowrap;
+}
+
+.status.warn {
+  color: var(--now);
+  font-weight: 700;
+}
+
+/* ── Schedule grid ──────────────────────────────────────────────────────── */
+.schedule {
+  flex: 1;
+  min-height: 0;
+  margin: 0 3vh 2.5vh;
+  display: grid;
+  grid-template-rows: var(--dayhead-h) 1fr;
+  background: var(--grid-bg);
+  border: 0.15vh solid var(--line);
+  border-radius: 0.8vh;
+  overflow: hidden;
+}
+
+.loading {
+  grid-column: 1 / -1;
+  grid-row: 1 / -1;
+  align-self: center;
+  justify-self: center;
+  font-size: calc(3vh * var(--scale));
+  color: var(--muted);
+}
+
+.corner {
+  border-bottom: 0.15vh solid var(--line);
+}
+
+.day-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: center;
+  gap: 1vh;
+  padding-top: 1.2vh;
+  border-left: 0.15vh solid var(--line);
+  border-bottom: 0.15vh solid var(--line);
+  white-space: nowrap;
+}
+
+.day-head .dow {
+  font-size: calc(2.8vh * var(--scale));
+  font-weight: 800;
+}
+
+.day-head .date {
+  font-size: calc(2.2vh * var(--scale));
+  color: var(--muted);
+}
+
+.day-head.today {
+  background: var(--black);
+  color: #fff;
+  border-bottom-color: var(--gold);
+}
+
+.day-head.today .date { color: var(--gold); }
+
+/* "Today" label: larger than the other day names */
+.day-head.today { align-items: center; padding-top: 0; }
+.day-head.today .dow { font-size: calc(4vh * var(--scale)); }
+.day-head.today .date { font-size: calc(2.8vh * var(--scale)); }
+
+.axis {
+  position: relative;
+}
+
+.axis-label {
+  position: absolute;
+  right: 1vh;
+  transform: translateY(-50%);
+  font-size: calc(1.8vh * var(--scale));
+  font-weight: 600;
+  color: var(--muted);
+  white-space: nowrap;
+}
+
+.day-col {
+  position: relative;
+  border-left: 0.15vh solid var(--line);
+  /* hour lines; --hours is set from config */
+  background-image:
+    linear-gradient(to bottom, var(--line) 0.12vh, transparent 0.12vh),
+    linear-gradient(to bottom, var(--line-soft) 0.12vh, transparent 0.12vh);
+  background-size: 100% calc(100% / var(--hours)), 100% calc(100% / var(--hours) / 2);
+}
+
+.day-col.today { background-color: var(--today); }
+
+/* Border around the whole Today column (header + day) */
+.day-head.today,
+.day-col.today {
+  border-left: var(--today-border) solid var(--black);
+  border-right: var(--today-border) solid var(--black);
+}
+.day-col.today { border-bottom: var(--today-border) solid var(--black); }
+
+/* ── Tutor blocks ───────────────────────────────────────────────────────── */
+.event {
+  position: absolute;
+  padding: 0.35vh 0.2vh 0;
+  container-type: inline-size;
+}
+
+.event-inner {
+  height: 100%;
+  overflow: hidden;
+  padding: 0.5vh 0.8vh;
+  border-radius: 0.6vh;
+  box-shadow: 0 0 0 0.12vh rgba(0, 0, 0, 0.18);
+  line-height: 1.15;
+}
+
+.event.past { opacity: 0.38; }
+
+/* Quick fade-in when switching to another calendar */
+.schedule.fade .event { animation: fade-in 0.35s ease-out; }
+@keyframes fade-in { from { opacity: 0; } }
+
+.event-name {
+  font-size: calc(2.2vh * var(--scale));
+  font-size: calc(clamp(1.35vh, 13cqi, 2.2vh) * var(--scale));
+  font-weight: 800;
+  overflow-wrap: anywhere;
+}
+
+.event-time,
+.event-course {
+  font-size: calc(1.6vh * var(--scale));
+  font-size: calc(clamp(1.15vh, 10cqi, 1.6vh) * var(--scale));
+  overflow-wrap: anywhere;
+}
+
+.event-time {
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+.event-course { opacity: 0.85; }
+
+/* One tutor covering several subjects at once */
+.event.multi .event-inner {
+  background: #fff;
+  color: var(--ink);
+  box-shadow: 0 0 0 0.2vh #6f6c68;
+}
+
+.tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4vh;
+  margin: 0.2vh 0 0.3vh;
+}
+
+.tag {
+  font-size: calc(1.35vh * var(--scale));
+  font-size: calc(clamp(1.05vh, 8.5cqi, 1.35vh) * var(--scale));
+  font-weight: 800;
+  padding: 0.15vh 0.6vh;
+  border-radius: 0.4vh;
+  white-space: nowrap;
+}
+
+/* Current-time line across today's column */
+.now-line {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 0.4vh;
+  background: var(--gold);
+  /* thin dark edge so the gold line stays visible over the cream "today" column */
+  box-shadow: 0 0 0 0.12vh var(--black);
+  z-index: 5;
+  pointer-events: none;
+}
+
+/* A dot at each end of the line */
+.now-line::before,
+.now-line::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  width: 1.5vh;
+  height: 1.5vh;
+  border-radius: 50%;
+  background: var(--gold);
+  box-shadow: 0 0 0 0.12vh var(--black);
+  transform: translateY(-50%);
+}
+
+.now-line::before { left: -0.7vh; }
+.now-line::after { right: -0.7vh; }

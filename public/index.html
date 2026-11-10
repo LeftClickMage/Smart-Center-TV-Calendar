@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>SMART Center Tutoring Schedule</title>
+  <link rel="stylesheet" href="/styles.css">
+  <script type="module" src="/app.js"></script>
+</head>
+<body>
+  <header class="masthead">
+    <img class="logo" id="logo" alt="Purdue University College of Science">
+    <div class="titles">
+      <div class="title" id="title"></div>
+      <div class="subtitle" id="subtitle"></div>
+    </div>
+    <div class="clock">
+      <div class="clock-time" id="clock-time"></div>
+      <div class="clock-date" id="clock-date"></div>
+    </div>
+  </header>
+
+  <div class="legend-bar">
+    <ul class="legend" id="legend"></ul>
+    <div class="status" id="status"></div>
+  </div>
+
+  <main class="schedule" id="schedule">
+    <div class="loading" id="loading">Loading schedule…</div>
+  </main>
+</body>
+</html>

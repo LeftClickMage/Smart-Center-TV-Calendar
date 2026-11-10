@@ -1,0 +1,7 @@
+node_modules/
+.wrangler/
+.DS_Store
+
+# Original logo source files (the site uses copies in public/assets/)
+COS cobrand/
+__pycache__/
